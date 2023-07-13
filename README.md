@@ -1,2 +1,2 @@
 # Image-Processing-Pipeline
-Algorithms implemented as part of image processing pipeline
+This repository contains the implementations of the algorithms of the Image Processing Pipeline done during my summer internship at MindGrove Technologies from May 16, 2023 to July 14, 2023. The algorithms include White Balance (Gray World Assumption), Demosaicing (Modified Adaptive Homogeneity Directed), Color Conversion between RGB and YCoCg which includes color correction and auto contrast and a naive implementation of the Bilateral Filter to reduce noise. Both the individual algorithms and the code that runs the algorithms in sequence are uploaded. 
