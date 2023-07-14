@@ -44,7 +44,7 @@ inline unsigned char clamp(int a)
     G B
     
 */
-void ahdDemosaic(int x, int y) {
+void ahdDemosaic_RGGB(int x, int y) {
     
     int i_1 = x - 1;
     int i_2 = x + 1;
@@ -109,6 +109,216 @@ void ahdDemosaic(int x, int y) {
     demosaicArray[temp_x * cols_demosaic + temp_y] = pixel;
 }
 
+/*
+    G R
+    B G
+    
+*/
+void ahdDemosaic_GRBG(int x, int y) {
+    
+    int i_1 = x - 1;
+    int i_2 = x + 1;
+    int i_3 = x - 2;
+    int i_4 = x + 2;
+
+    int j_1 = y - 1;
+    int j_2 = y + 1;
+    int j_3 = y - 2;
+    int j_4 = y + 2;
+    int H,V;
+    int red, blue, green;
+    if (x % 2 == 1 && y % 2 == 1){ // Blue Row and Green Pixel
+        red = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y]) / 2;
+        blue = (bayerArray[x * cols + j_1] + bayerArray[x* cols + j_2]) / 2;
+        green = bayerArray[x * cols + y];
+    }
+    if (x % 2 == 1 && y % 2 == 0){ // Blue Row and Blue Pixel
+        V = abs((bayerArray[i_3 * cols + y] / 2) + (bayerArray[i_4 * cols + y] / 2) - bayerArray[x * cols + y]);
+        H = abs((bayerArray[x * cols + j_3] / 2) + (bayerArray[x * cols + j_4] / 2) - bayerArray[x * cols + y]);
+        if (H > V){
+            green = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2])/ 2;
+        }
+        else if(H < V){
+            green = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y])/ 2;
+        }
+        else{
+            green = (bayerArray[x * cols + j_3] / 4) + (bayerArray[x * cols + j_1] / 4) + (bayerArray[i_1 * cols + y] / 4) + (bayerArray[i_2 * cols + y] / 4); 
+        }
+        red = (bayerArray[i_1 * cols + j_1] / 4) + (bayerArray[i_1 * cols + j_2] / 4) + (bayerArray[i_2 * cols + j_1] / 4) + (bayerArray[i_2 * cols + j_2] / 4);
+        blue = bayerArray[x * cols + y];
+    }
+    if (x % 2 == 0 && y % 2 == 1){ // Red Row and Red Pixel
+        V = abs((bayerArray[i_3 * cols + y] / 2) + (bayerArray[i_4 * cols + y] / 2) - bayerArray[x * cols + y]);
+        H = abs((bayerArray[x * cols + j_3] / 2) + (bayerArray[x * cols + j_4] / 2) - bayerArray[x * cols + y]);
+        if (H > V){
+            green = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2])/ 2;
+        }
+        else if(H < V){
+            green = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y])/ 2;
+        }
+        else{
+            green = (bayerArray[x * cols + j_3] / 4) + (bayerArray[x * cols + j_1] / 4) + (bayerArray[i_1 * cols + y] / 4) + (bayerArray[i_2 * cols + y] / 4); 
+        }
+        blue = (bayerArray[i_1 * cols + j_1] / 4) + (bayerArray[i_1 * cols + j_2] / 4) + (bayerArray[i_2 * cols + j_1] / 4) + (bayerArray[i_2 * cols + j_2] / 4);
+        red = bayerArray[x * cols + y];
+
+    }
+    if (x % 2 == 0 && y % 2 == 0){ // Red Row and Green Pixel
+        red = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2]) / 2;
+        blue = (bayerArray[i_1 *cols + y] + bayerArray[i_2 * cols + y]) / 2;
+        green = bayerArray[x * cols + y];
+    }
+    
+    // Create and return the demosaiced pixel
+    RGB pixel;
+    pixel.red = clamp(red);
+    pixel.green = clamp(green);
+    pixel.blue = clamp(blue);
+    int temp_x = x - 2;
+    int temp_y = y - 2;
+    demosaicArray[temp_x * cols_demosaic + temp_y] = pixel;
+}
+
+/*
+    B G
+    G R
+    
+*/
+void ahdDemosaic_BGGR(int x, int y) {
+    
+    int i_1 = x - 1;
+    int i_2 = x + 1;
+    int i_3 = x - 2;
+    int i_4 = x + 2;
+
+    int j_1 = y - 1;
+    int j_2 = y + 1;
+    int j_3 = y - 2;
+    int j_4 = y + 2;
+    int H,V;
+    int red, blue, green;
+    if (x % 2 == 0 && y % 2 == 1){ // Blue Row and Green Pixel
+        red = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y]) / 2;
+        blue = (bayerArray[x * cols + j_1] + bayerArray[x* cols + j_2]) / 2;
+        green = bayerArray[x * cols + y];
+    }
+    if (x % 2 == 0 && y % 2 == 0){ // Blue Row and Blue Pixel
+        V = abs((bayerArray[i_3 * cols + y] / 2) + (bayerArray[i_4 * cols + y] / 2) - bayerArray[x * cols + y]);
+        H = abs((bayerArray[x * cols + j_3] / 2) + (bayerArray[x * cols + j_4] / 2) - bayerArray[x * cols + y]);
+        if (H > V){
+            green = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2])/ 2;
+        }
+        else if(H < V){
+            green = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y])/ 2;
+        }
+        else{
+            green = (bayerArray[x * cols + j_3] / 4) + (bayerArray[x * cols + j_1] / 4) + (bayerArray[i_1 * cols + y] / 4) + (bayerArray[i_2 * cols + y] / 4); 
+        }
+        red = (bayerArray[i_1 * cols + j_1] / 4) + (bayerArray[i_1 * cols + j_2] / 4) + (bayerArray[i_2 * cols + j_1] / 4) + (bayerArray[i_2 * cols + j_2] / 4);
+        blue = bayerArray[x * cols + y];
+    }
+    if (x % 2 == 1 && y % 2 == 1){ // Red Row and Red Pixel
+        V = abs((bayerArray[i_3 * cols + y] / 2) + (bayerArray[i_4 * cols + y] / 2) - bayerArray[x * cols + y]);
+        H = abs((bayerArray[x * cols + j_3] / 2) + (bayerArray[x * cols + j_4] / 2) - bayerArray[x * cols + y]);
+        if (H > V){
+            green = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2])/ 2;
+        }
+        else if(H < V){
+            green = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y])/ 2;
+        }
+        else{
+            green = (bayerArray[x * cols + j_3] / 4) + (bayerArray[x * cols + j_1] / 4) + (bayerArray[i_1 * cols + y] / 4) + (bayerArray[i_2 * cols + y] / 4); 
+        }
+        blue = (bayerArray[i_1 * cols + j_1] / 4) + (bayerArray[i_1 * cols + j_2] / 4) + (bayerArray[i_2 * cols + j_1] / 4) + (bayerArray[i_2 * cols + j_2] / 4);
+        red = bayerArray[x * cols + y];
+
+    }
+    if (x % 2 == 1 && y % 2 == 0){ // Red Row and Green Pixel
+        red = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2]) / 2;
+        blue = (bayerArray[i_1 *cols + y] + bayerArray[i_2 * cols + y]) / 2;
+        green = bayerArray[x * cols + y];
+    }
+    
+    // Create and return the demosaiced pixel
+    RGB pixel;
+    pixel.red = clamp(red);
+    pixel.green = clamp(green);
+    pixel.blue = clamp(blue);
+    int temp_x = x - 2;
+    int temp_y = y - 2;
+    demosaicArray[temp_x * cols_demosaic + temp_y] = pixel;
+}
+
+/*
+    G B
+    R G
+    
+*/
+void ahdDemosaic_GBRG(int x, int y) {
+    
+    int i_1 = x - 1;
+    int i_2 = x + 1;
+    int i_3 = x - 2;
+    int i_4 = x + 2;
+
+    int j_1 = y - 1;
+    int j_2 = y + 1;
+    int j_3 = y - 2;
+    int j_4 = y + 2;
+    int H,V;
+    int red, blue, green;
+    if (x % 2 == 0 && y % 2 == 0){ // Blue Row and Green Pixel
+        red = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y]) / 2;
+        blue = (bayerArray[x * cols + j_1] + bayerArray[x* cols + j_2]) / 2;
+        green = bayerArray[x * cols + y];
+    }
+    if (x % 2 == 0 && y % 2 == 1){ // Blue Row and Blue Pixel
+        V = abs((bayerArray[i_3 * cols + y] / 2) + (bayerArray[i_4 * cols + y] / 2) - bayerArray[x * cols + y]);
+        H = abs((bayerArray[x * cols + j_3] / 2) + (bayerArray[x * cols + j_4] / 2) - bayerArray[x * cols + y]);
+        if (H > V){
+            green = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2])/ 2;
+        }
+        else if(H < V){
+            green = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y])/ 2;
+        }
+        else{
+            green = (bayerArray[x * cols + j_3] / 4) + (bayerArray[x * cols + j_1] / 4) + (bayerArray[i_1 * cols + y] / 4) + (bayerArray[i_2 * cols + y] / 4); 
+        }
+        red = (bayerArray[i_1 * cols + j_1] / 4) + (bayerArray[i_1 * cols + j_2] / 4) + (bayerArray[i_2 * cols + j_1] / 4) + (bayerArray[i_2 * cols + j_2] / 4);
+        blue = bayerArray[x * cols + y];
+    }
+    if (x % 2 == 1 && y % 2 == 0){ // Red Row and Red Pixel
+        V = abs((bayerArray[i_3 * cols + y] / 2) + (bayerArray[i_4 * cols + y] / 2) - bayerArray[x * cols + y]);
+        H = abs((bayerArray[x * cols + j_3] / 2) + (bayerArray[x * cols + j_4] / 2) - bayerArray[x * cols + y]);
+        if (H > V){
+            green = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2])/ 2;
+        }
+        else if(H < V){
+            green = (bayerArray[i_1 * cols + y] + bayerArray[i_2 * cols + y])/ 2;
+        }
+        else{
+            green = (bayerArray[x * cols + j_3] / 4) + (bayerArray[x * cols + j_1] / 4) + (bayerArray[i_1 * cols + y] / 4) + (bayerArray[i_2 * cols + y] / 4); 
+        }
+        blue = (bayerArray[i_1 * cols + j_1] / 4) + (bayerArray[i_1 * cols + j_2] / 4) + (bayerArray[i_2 * cols + j_1] / 4) + (bayerArray[i_2 * cols + j_2] / 4);
+        red = bayerArray[x * cols + y];
+
+    }
+    if (x % 2 == 1 && y % 2 == 1){ // Red Row and Green Pixel
+        red = (bayerArray[x * cols + j_1] + bayerArray[x * cols + j_2]) / 2;
+        blue = (bayerArray[i_1 *cols + y] + bayerArray[i_2 * cols + y]) / 2;
+        green = bayerArray[x * cols + y];
+    }
+    
+    // Create and return the demosaiced pixel
+    RGB pixel;
+    pixel.red = clamp(red);
+    pixel.green = clamp(green);
+    pixel.blue = clamp(blue);
+    int temp_x = x - 2;
+    int temp_y = y - 2;
+    demosaicArray[temp_x * cols_demosaic + temp_y] = pixel;
+}
+
 int main() {
     
     for (int i = 0; i < rows; i++){
@@ -150,7 +360,7 @@ int main() {
     // Demosaicing
     for (int i = 2; i < rows_demosaic; ++i) {
         for (int j = 2; j < cols_demosaic; ++j) {
-            ahdDemosaic(i, j);
+            ahdDemosaic_RGGB(i, j);
         }
     }
 
